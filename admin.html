@@ -163,6 +163,124 @@
             grid-template-columns: 1fr 1fr;
             gap: 30px;
         }
+        
+        .search-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .search-controls .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        .detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .detail-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-size: 1.1em;
+        }
 
         .table-section {
             background: #f8f9fa;
@@ -313,6 +431,19 @@
                     </div>
                 </div>
 
+                <div class="search-section">
+                    <h3>🔍 Buscar Arrendatario</h3>
+                    <div class="search-controls">
+                        <div class="form-group">
+                            <label for="searchInput">Buscar por nombre o RUT:</label>
+                            <input type="text" id="searchInput" placeholder="Ej: Juan Pérez o 12.345.678-9">
+                        </div>
+                        <button class="btn btn-primary" onclick="searchArrendatario()">🔍 Buscar</button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">🧹 Limpiar</button>
+                    </div>
+                    <div id="searchResults" style="margin-top: 20px;"></div>
+                </div>
+
                 <div class="export-section">
                     <h3>📊 Exportar Datos</h3>
                     <p>Descargar todos los datos recopilados en formato Excel o PDF</p>
@@ -369,6 +500,19 @@
                 <div style="margin-top: 30px; text-align: center;">
                     <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles -->
+    <div id="detailModal" class="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Detalles del Arrendatario</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
             </div>
         </div>
     </div>
@@ -536,7 +680,10 @@
                         ${response ? '✅ Completado' : '❌ Pendiente'}
                     </td>
                     <td>
-                        ${response ? `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo1')">🗑️ Eliminar</button>` : ''}
+                        ${response ? `
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8em; margin-right: 5px;" onclick="viewDetails('${response.id}')">👁️ Ver</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo1')">🗑️ Eliminar</button>
+                        ` : ''}
                     </td>
                 `;
                 tableGrupo1.appendChild(row);
@@ -559,7 +706,10 @@
                         ${response ? '✅ Completado' : '❌ Pendiente'}
                     </td>
                     <td>
-                        ${response ? `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo2')">🗑️ Eliminar</button>` : ''}
+                        ${response ? `
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8em; margin-right: 5px;" onclick="viewDetails('${response.id}')">👁️ Ver</button>
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo2')">🗑️ Eliminar</button>
+                        ` : ''}
                     </td>
                 `;
                 tableGrupo2.appendChild(row);
@@ -569,10 +719,164 @@
         window.refreshData = function() {
             loadData();
         }
+        
+        window.searchArrendatario = function() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '<div class="alert alert-error">Por favor ingrese un término de búsqueda</div>';
+                return;
+            }
+            
+            const results = allResponses.filter(response => {
+                const nombre = response.nombre ? response.nombre.toLowerCase() : '';
+                const rut = response.rut ? response.rut.toLowerCase().replace(/\./g, '') : '';
+                const searchNormalized = searchTerm.replace(/\./g, '');
+                
+                return nombre.includes(searchNormalized) || rut.includes(searchNormalized);
+            });
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="alert alert-error">No se encontraron resultados</div>';
+            } else {
+                let html = '<div class="alert alert-success">Se encontraron ' + results.length + ' resultado(s)</div>';
+                html += '<div style="display: grid; gap: 15px; margin-top: 15px;">';
+                
+                results.forEach(result => {
+                    const grupo = result.formulario === 'grupo1' ? 'Grupo 1' : 'Grupo 2';
+                    html += `
+                        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e1e5e9; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${result.nombre}</strong><br>
+                                <small style="color: #666;">Local: ${result.numeroLocal} | RUT: ${result.rut} | ${grupo}</small>
+                            </div>
+                            <button class="btn btn-primary" onclick="viewDetails('${result.id}')">👁️ Ver Detalles</button>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                resultsDiv.innerHTML = html;
+            }
+        }
+        
+        window.clearSearch = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+        
+        window.viewDetails = function(responseId) {
+            const response = allResponses.find(r => r.id === responseId);
+            if (!response) {
+                alert('No se encontraron los datos');
+                return;
+            }
+            
+            const modalBody = document.getElementById('modalBody');
+            const fechaEnvio = response.fechaEnvio ? new Date(response.fechaEnvio.seconds * 1000).toLocaleString() : 'No disponible';
+            
+            let html = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Formulario</div>
+                        <div class="detail-value">${response.formulario === 'grupo1' ? 'Grupo 1' : 'Grupo 2'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">N° Local</div>
+                        <div class="detail-value">${response.numeroLocal || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre/Razón Social</div>
+                        <div class="detail-value">${response.nombre || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">RUT</div>
+                        <div class="detail-value">${response.rut || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tipo</div>
+                        <div class="detail-value">${response.tipo || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Representante Legal</div>
+                        <div class="detail-value">${response.representanteLegal || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">RUT Representante</div>
+                        <div class="detail-value">${response.rutRepresentante || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Teléfono</div>
+                        <div class="detail-value">${response.telefono || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${response.email || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Región</div>
+                        <div class="detail-value">${response.region || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Ciudad</div>
+                        <div class="detail-value">${response.ciudad || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Dirección</div>
+                        <div class="detail-value">${response.direccion || '-'} ${response.numero || ''}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Departamento/Oficina</div>
+                        <div class="detail-value">${response.departamento || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha de Envío</div>
+                        <div class="detail-value">${fechaEnvio}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">IP</div>
+                        <div class="detail-value">${response.ip || '-'}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-danger" onclick="deleteResponseFromModal('${response.id}', '${response.formulario}')">🗑️ Eliminar Registro</button>
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+            document.getElementById('detailModal').style.display = 'block';
+        }
+        
+        window.closeModal = function() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+        
+        window.deleteResponseFromModal = async function(responseId, grupo) {
+            if (await deleteResponse(responseId, grupo)) {
+                closeModal();
+            }
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Permitir búsqueda con Enter
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchArrendatario();
+                }
+            });
+        });
 
         window.deleteResponse = async function(responseId, grupo) {
             if (!confirm('¿Está seguro de que desea eliminar esta respuesta? Esta acción no se puede deshacer.')) {
-                return;
+                return false;
             }
             
             const loadingDiv = document.getElementById('loadingData');
@@ -582,12 +886,14 @@
                 await deleteDoc(doc(db, 'arrendatarios', responseId));
                 alert('Respuesta eliminada exitosamente');
                 await loadData(); // Recargar datos
+                return true;
             } catch (error) {
                 console.error('Error al eliminar:', error);
                 alert('Error al eliminar la respuesta. Por favor intente nuevamente.');
+                return false;
+            } finally {
+                loadingDiv.style.display = 'none';
             }
-            
-            loadingDiv.style.display = 'none';
         }
 
         window.exportToExcel = function() {
