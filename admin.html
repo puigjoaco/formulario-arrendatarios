@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Formularios Arrendatarios</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .admin-container {
+            padding: 40px;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .export-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .tables-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .table-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .table-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-table th,
+        .status-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .status-table th {
+            background: #343a40;
+            color: white;
+            font-weight: 600;
+        }
+
+        .status-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-completed {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .admin-container {
+                padding: 20px;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+            
+            .tables-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Panel de Administración</h1>
+            <p>Gestión de Formularios de Arrendatarios</p>
+        </div>
+        
+        <div class="admin-container">
+            <!-- Formulario de Login -->
+            <div id="loginSection" class="login-form">
+                <h2>Acceso Administrador</h2>
+                <div class="form-group">
+                    <label for="adminPassword">Contraseña de Administrador:</label>
+                    <input type="password" id="adminPassword" placeholder="Ingrese la contraseña">
+                </div>
+                <button class="btn btn-primary" onclick="login()">🔓 Acceder</button>
+                <div id="loginMessage"></div>
+            </div>
+
+            <!-- Panel Principal -->
+            <div id="adminPanel" class="admin-panel">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="statGrupo1Completed">0</div>
+                        <div class="stat-label">Grupo 1 Completados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statGrupo2Completed">0</div>
+                        <div class="stat-label">Grupo 2 Completados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statTotalCompleted">0</div>
+                        <div class="stat-label">Total Completados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statTotalPending">0</div>
+                        <div class="stat-label">Total Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <h3>📊 Exportar Datos</h3>
+                    <p>Descargar todos los datos recopilados en formato Excel o PDF</p>
+                    <div class="export-buttons">
+                        <button class="btn btn-success" onclick="exportToExcel()">📗 Exportar a Excel</button>
+                        <button class="btn btn-danger" onclick="exportToPDF()">📄 Exportar a PDF</button>
+                        <button class="btn btn-primary" onclick="refreshData()">🔄 Actualizar Datos</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loadingData">
+                    <div class="spinner"></div>
+                    Cargando datos...
+                </div>
+
+                <div class="tables-container">
+                    <!-- Tabla Grupo 1 -->
+                    <div class="table-section">
+                        <div class="table-title">📋 Estado Grupo 1</div>
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Local</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableGrupo1">
+                                <!-- Datos dinámicos -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tabla Grupo 2 -->
+                    <div class="table-section">
+                        <div class="table-title">📋 Estado Grupo 2</div>
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Local</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableGrupo2">
+                                <!-- Datos dinámicos -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-danger" onclick="logout()">🚪 Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiMgABeT-o0grleNAn9KEFhhqgyT13Nqc",
+            authDomain: "arrendatarios-datos.firebaseapp.com",
+            projectId: "arrendatarios-datos",
+            storageBucket: "arrendatarios-datos.firebasestorage.app",
+            messagingSenderId: "79764229076",
+            appId: "1:79764229076:web:25b4f6c346070781a46441"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Contraseña de administrador (en producción, esto debería estar en el servidor)
+        const ADMIN_PASSWORD = "admin2024";
+
+        // Datos base de los grupos
+        const grupo1Data = [
+            { local: "001", nombre: "Comercial y Servicios Christian Figueroa EIRL" },
+            { local: "002", nombre: "Manuel Nelson Aguilera Sepúlveda" },
+            { local: "003", nombre: "Obras Menores Abidan Ríos Velázquez EIRL" },
+            { local: "004", nombre: "Constructora Del Pino SpA" },
+            { local: "005", nombre: "Sociedad Marticorena y Cruz Ltda" },
+            { local: "006", nombre: "Import y Export Bueno y Barato Ltda" },
+            { local: "007", nombre: "Óptica Solane SpA" },
+            { local: "008", nombre: "Mario Martínez Lagos" },
+            { local: "010", nombre: "Comercial y Manufactura Alexis Orlando Antonio Esperguel Sandoval EIRL" },
+            { local: "011", nombre: "Julia Andrea Caniullán Melín" },
+            { local: "012", nombre: "Comercial e Inversiones El Arado Ltda" },
+            { local: "013", nombre: "Rubén Darío Vera Pinto" },
+            { local: "015", nombre: "Comercial Garra Ltda" },
+            { local: "016", nombre: "Alberto Herrera Benítez" },
+            { local: "017", nombre: "Galaxy Geek SpA" },
+            { local: "018", nombre: "Pedro Iván Torres Pedrero" },
+            { local: "019", nombre: "Comercial Central Oro Limitada" },
+            { local: "020", nombre: "Comercializadora Mondaca y Compañía Ltda" },
+            { local: "021", nombre: "Comercial Jorge Zabala Zabala EIRL" },
+            { local: "022", nombre: "Nelson Iván Franco Mieres Actividades de Restaurantes y Servicios Móvil de Comidas EIRL" },
+            { local: "024", nombre: "Comercial Tori SpA" },
+            { local: "025", nombre: "SOS Diseño Industrial SpA" },
+            { local: "026", nombre: "Gram SpA" },
+            { local: "027", nombre: "Puco Market SpA" },
+            { local: "028", nombre: "Bogotá Barber Shop SpA" },
+            { local: "029", nombre: "Starken SpA" },
+            { local: "030", nombre: "Sociedad Comercial Santa Bárbara Ltda" },
+            { local: "031", nombre: "Reparaciones y Mantenciones San Martín SpA" },
+            { local: "032", nombre: "Aceites Industriales Ltda" },
+            { local: "033", nombre: "Rental Lift SpA" },
+            { local: "034", nombre: "Adriana Maribel Guzmán Almonacid" },
+            { local: "035", nombre: "Soledad Loreto Contreras Macaya" },
+            { local: "036", nombre: "Comercial Se SpA" },
+            { local: "038", nombre: "Inversiones Kafena SpA" },
+            { local: "039", nombre: "Benjamín Ignacio de la Fuente Schalchli" },
+            { local: "040", nombre: "Gustavo Andrés Carrasco Sandoval" },
+            { local: "041", nombre: "Cristóbal Puig" },
+            { local: "042", nombre: "Cristián Martínez Pincheira" },
+            { local: "043", nombre: "Jonathan García Garay" },
+            { local: "044", nombre: "Cristián Martínez Pincheira" },
+            { local: "045", nombre: "Sociedad Flor de Loto SpA" },
+            { local: "047", nombre: "Administración Hotelera y Gastronómica SpA" },
+            { local: "048", nombre: "Comercializadora Mondaca y Compañía Ltda" }
+        ];
+
+        const grupo2Data = [
+            { local: "001", nombre: "Inversiones Dickinson SpA" },
+            { local: "002", nombre: "Novena Green Solutions SpA" },
+            { local: "004", nombre: "Astrid Zamora Ascanio" },
+            { local: "005", nombre: "Jose Ibañez" },
+            { local: "006", nombre: "Saavedra y Reyes SpA" },
+            { local: "007", nombre: "Inversiones Dickinson SpA" },
+            { local: "008", nombre: "La Bodeguita Verde" },
+            { local: "009", nombre: "Kropka Tatoo Supply SpA" },
+            { local: "010", nombre: "Recimed SpA" },
+            { local: "011", nombre: "BMG SpA" },
+            { local: "012", nombre: "Lady Studio SpA" },
+            { local: "013", nombre: "Golden Pacific S.A." },
+            { local: "016", nombre: "Gustavo Andrés Carrasco Sandoval" }
+        ];
+
+        let allResponses = [];
+
+        window.login = function() {
+            const password = document.getElementById('adminPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadData();
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-error">Contraseña incorrecta</div>';
+                setTimeout(() => messageDiv.innerHTML = '', 3000);
+            }
+        }
+
+        window.logout = function() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        async function loadData() {
+            const loadingDiv = document.getElementById('loadingData');
+            loadingDiv.style.display = 'block';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, 'arrendatarios'));
+                allResponses = [];
+                
+                querySnapshot.forEach((doc) => {
+                    allResponses.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                updateStats();
+                updateTables();
+                
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                alert('Error al cargar los datos de Firebase');
+            }
+            
+            loadingDiv.style.display = 'none';
+        }
+
+        function updateStats() {
+            const grupo1Completed = allResponses.filter(r => r.formulario === 'grupo1').length;
+            const grupo2Completed = allResponses.filter(r => r.formulario === 'grupo2').length;
+            const totalCompleted = grupo1Completed + grupo2Completed;
+            const totalPending = (grupo1Data.length + grupo2Data.length) - totalCompleted;
+
+            document.getElementById('statGrupo1Completed').textContent = grupo1Completed;
+            document.getElementById('statGrupo2Completed').textContent = grupo2Completed;
+            document.getElementById('statTotalCompleted').textContent = totalCompleted;
+            document.getElementById('statTotalPending').textContent = totalPending;
+        }
+
+        function updateTables() {
+            // Actualizar tabla Grupo 1
+            const tableGrupo1 = document.getElementById('tableGrupo1');
+            tableGrupo1.innerHTML = '';
+            
+            grupo1Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo1' && r.numeroLocal === item.local
+                );
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.local}</td>
+                    <td>${item.nombre}</td>
+                    <td class="${response ? 'status-completed' : 'status-pending'}">
+                        ${response ? '✅ Completado' : '❌ Pendiente'}
+                    </td>
+                    <td>
+                        ${response ? `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo1')">🗑️ Eliminar</button>` : ''}
+                    </td>
+                `;
+                tableGrupo1.appendChild(row);
+            });
+
+            // Actualizar tabla Grupo 2
+            const tableGrupo2 = document.getElementById('tableGrupo2');
+            tableGrupo2.innerHTML = '';
+            
+            grupo2Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo2' && r.numeroLocal === item.local
+                );
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.local}</td>
+                    <td>${item.nombre}</td>
+                    <td class="${response ? 'status-completed' : 'status-pending'}">
+                        ${response ? '✅ Completado' : '❌ Pendiente'}
+                    </td>
+                    <td>
+                        ${response ? `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.8em;" onclick="deleteResponse('${response.id}', 'grupo2')">🗑️ Eliminar</button>` : ''}
+                    </td>
+                `;
+                tableGrupo2.appendChild(row);
+            });
+        }
+
+        window.refreshData = function() {
+            loadData();
+        }
+
+        window.deleteResponse = async function(responseId, grupo) {
+            if (!confirm('¿Está seguro de que desea eliminar esta respuesta? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            const loadingDiv = document.getElementById('loadingData');
+            loadingDiv.style.display = 'block';
+            
+            try {
+                await deleteDoc(doc(db, 'arrendatarios', responseId));
+                alert('Respuesta eliminada exitosamente');
+                await loadData(); // Recargar datos
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                alert('Error al eliminar la respuesta. Por favor intente nuevamente.');
+            }
+            
+            loadingDiv.style.display = 'none';
+        }
+
+        window.exportToExcel = function() {
+            // Preparar datos para Excel
+            const data = [];
+            
+            // Agregar headers
+            data.push([
+                'Grupo', 'Local', 'Nombre', 'RUT', 'Tipo', 'Teléfono', 'Email', 
+                'Región', 'Ciudad', 'Dirección', 'Número', 'Departamento',
+                'Representante Legal', 'RUT Representante', 'Fecha Envío', 'Estado'
+            ]);
+            
+            // Agregar datos del Grupo 1
+            grupo1Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo1' && r.numeroLocal === item.local
+                );
+                
+                if (response) {
+                    data.push([
+                        'Grupo 1', item.local, response.nombre, response.rut,
+                        response.tipo || '-', response.telefono || '-', response.email || '-',
+                        response.region || '-', response.ciudad || '-', 
+                        response.direccion || '-', response.numero || '-', response.departamento || '-',
+                        response.representanteLegal || '-', response.rutRepresentante || '-',
+                        response.fechaEnvio ? new Date(response.fechaEnvio.seconds * 1000).toLocaleDateString() : '-',
+                        'Completado'
+                    ]);
+                } else {
+                    data.push([
+                        'Grupo 1', item.local, item.nombre, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'Pendiente'
+                    ]);
+                }
+            });
+            
+            // Agregar datos del Grupo 2
+            grupo2Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo2' && r.numeroLocal === item.local
+                );
+                
+                if (response) {
+                    data.push([
+                        'Grupo 2', item.local, response.nombre, response.rut,
+                        response.tipo || '-', response.telefono || '-', response.email || '-',
+                        response.region || '-', response.ciudad || '-', 
+                        response.direccion || '-', response.numero || '-', response.departamento || '-',
+                        response.representanteLegal || '-', response.rutRepresentante || '-',
+                        response.fechaEnvio ? new Date(response.fechaEnvio.seconds * 1000).toLocaleDateString() : '-',
+                        'Completado'
+                    ]);
+                } else {
+                    data.push([
+                        'Grupo 2', item.local, item.nombre, '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'Pendiente'
+                    ]);
+                }
+            });
+            
+            // Crear y descargar Excel
+            downloadExcel(data);
+        }
+
+        function downloadExcel(data) {
+            // Crear CSV (compatible con Excel)
+            const csvContent = data.map(row => 
+                row.map(cell => `"${cell}"`).join(',')
+            ).join('\n');
+            
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `formularios_arrendatarios_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.exportToPDF = function() {
+            // Para PDF usaremos la API del navegador para imprimir
+            const printContent = generatePrintableReport();
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function generatePrintableReport() {
+            const currentDate = new Date().toLocaleDateString();
+            
+            let html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Reporte Formularios Arrendatarios</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #333; text-align: center; }
+                        .stats { display: flex; justify-content: space-around; margin: 20px 0; }
+                        .stat { text-align: center; padding: 10px; border: 1px solid #ddd; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .completed { color: green; font-weight: bold; }
+                        .pending { color: red; font-weight: bold; }
+                        @media print { 
+                            .no-print { display: none; }
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>📊 Reporte Formularios Arrendatarios</h1>
+                    <p style="text-align: center;">Fecha: ${currentDate}</p>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <h3>${allResponses.filter(r => r.formulario === 'grupo1').length}</h3>
+                            <p>Grupo 1 Completados</p>
+                        </div>
+                        <div class="stat">
+                            <h3>${allResponses.filter(r => r.formulario === 'grupo2').length}</h3>
+                            <p>Grupo 2 Completados</p>
+                        </div>
+                        <div class="stat">
+                            <h3>${allResponses.length}</h3>
+                            <p>Total Completados</p>
+                        </div>
+                        <div class="stat">
+                            <h3>${(grupo1Data.length + grupo2Data.length) - allResponses.length}</h3>
+                            <p>Total Pendientes</p>
+                        </div>
+                    </div>
+                    
+                    <h2>Grupo 1</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Local</th><th>Nombre</th><th>Estado</th><th>Tipo</th><th>Teléfono</th><th>Email</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            grupo1Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo1' && r.numeroLocal === item.local
+                );
+                
+                html += `
+                    <tr>
+                        <td>${item.local}</td>
+                        <td>${response ? response.nombre : item.nombre}</td>
+                        <td class="${response ? 'completed' : 'pending'}">
+                            ${response ? 'Completado' : 'Pendiente'}
+                        </td>
+                        <td>${response ? response.tipo || '-' : '-'}</td>
+                        <td>${response ? response.telefono || '-' : '-'}</td>
+                        <td>${response ? response.email || '-' : '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <h2>Grupo 2</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Local</th><th>Nombre</th><th>Estado</th><th>Tipo</th><th>Teléfono</th><th>Email</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            grupo2Data.forEach(item => {
+                const response = allResponses.find(r => 
+                    r.formulario === 'grupo2' && r.numeroLocal === item.local
+                );
+                
+                html += `
+                    <tr>
+                        <td>${item.local}</td>
+                        <td>${response ? response.nombre : item.nombre}</td>
+                        <td class="${response ? 'completed' : 'pending'}">
+                            ${response ? 'Completado' : 'Pendiente'}
+                        </td>
+                        <td>${response ? response.tipo || '-' : '-'}</td>
+                        <td>${response ? response.telefono || '-' : '-'}</td>
+                        <td>${response ? response.email || '-' : '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="no-print" style="text-align: center; margin-top: 30px;">
+                        <button onclick="window.print()">🖨️ Imprimir</button>
+                        <button onclick="window.close()">❌ Cerrar</button>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            return html;
+        }
+
+        // Auto-login para pruebas (remover en producción)
+        // window.addEventListener('load', () => {
+        //     document.getElementById('adminPassword').value = ADMIN_PASSWORD;
+        // });
+    </script>
+</body>
+</html>

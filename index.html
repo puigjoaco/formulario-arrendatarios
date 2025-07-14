@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularios de Arrendatarios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 50px 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .content {
+            padding: 60px 40px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .form-links {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 25px 30px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .form-link .emoji {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .form-link .title {
+            display: block;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .form-link .subtitle-link {
+            display: block;
+            font-size: 0.9em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .info {
+            margin-top: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .content {
+                padding: 40px 20px;
+            }
+            
+            .subtitle {
+                font-size: 1.3em;
+            }
+            
+            .form-link {
+                padding: 20px;
+                font-size: 1.1em;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .form-links {
+                flex-direction: row;
+                max-width: none;
+            }
+            
+            .form-link {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Formularios</h1>
+            <p>Sistema de Registro de Datos para Arrendatarios</p>
+        </div>
+        
+        <div class="content">
+            <h2 class="subtitle">Seleccione su formulario correspondiente</h2>
+            
+            <div class="form-links">
+                <a href="formulario1.html" class="form-link">
+                    <span class="emoji">📝</span>
+                    <span class="title">Formulario 1</span>
+                    <span class="subtitle-link">Primer grupo de arrendatarios</span>
+                </a>
+                
+                <a href="formulario2.html" class="form-link">
+                    <span class="emoji">📋</span>
+                    <span class="title">Formulario 2</span>
+                    <span class="subtitle-link">Segundo grupo de arrendatarios</span>
+                </a>
+            </div>
+            
+            <div class="info">
+                <h3>📌 Instrucciones importantes:</h3>
+                <p>
+                    • Seleccione el formulario que corresponde a su nombre<br>
+                    • Complete todos los campos requeridos (*)<br>
+                    • Su nombre debe coincidir exactamente con su RUT<br>
+                    • Los datos se guardarán de forma segura
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Agregar efectos suaves de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.8s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
