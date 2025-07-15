@@ -654,11 +654,71 @@
             const grupo2Completed = allResponses.filter(r => r.formulario === 'grupo2').length;
             const totalCompleted = grupo1Completed + grupo2Completed;
             const totalPending = (grupo1Data.length + grupo2Data.length) - totalCompleted;
+            
+            console.log('=== DEPURACIÓN DE CONTEO ===');
+            console.log('Total contratos Grupo 1:', grupo1Data.length);
+            console.log('Total contratos Grupo 2:', grupo2Data.length);
+            console.log('Total contratos en sistema:', grupo1Data.length + grupo2Data.length);
+            console.log('Completados Grupo 1:', grupo1Completed);
+            console.log('Completados Grupo 2:', grupo2Completed);
+            console.log('Total completados:', totalCompleted);
+            console.log('Total pendientes calculado:', totalPending);
+            console.log('Respuestas cargadas de Firebase:', allResponses.length);
+            console.log('Respuestas por grupo:', allResponses.map(r => ({ local: r.numeroLocal, grupo: r.formulario })));
+            
+            // Verificar qué contratos NO tienen match
+            console.log('=== VERIFICACIÓN DE PENDIENTES ===');
+            let pendientesRealesGrupo1 = 0;
+            let pendientesRealesGrupo2 = 0;
+            
+            grupo1Data.forEach(item => {
+                const found = allResponses.find(r => {
+                    const firebaseLocal = String(r.numeroLocal || '').trim();
+                    const itemLocal = String(item.local || '').trim();
+                    return r.formulario === 'grupo1' && firebaseLocal === itemLocal;
+                });
+                if (!found) {
+                    pendientesRealesGrupo1++;
+                    console.log(`Grupo 1 - Pendiente: Local ${item.local} - ${item.nombre}`);
+                }
+            });
+            
+            grupo2Data.forEach(item => {
+                const found = allResponses.find(r => {
+                    const firebaseLocal = String(r.numeroLocal || '').trim();
+                    const itemLocal = String(item.local || '').trim();
+                    return r.formulario === 'grupo2' && firebaseLocal === itemLocal;
+                });
+                if (!found) {
+                    pendientesRealesGrupo2++;
+                    console.log(`Grupo 2 - Pendiente: Local ${item.local} - ${item.nombre}`);
+                }
+            });
+            
+            console.log('Pendientes reales Grupo 1:', pendientesRealesGrupo1);
+            console.log('Pendientes reales Grupo 2:', pendientesRealesGrupo2);
+            console.log('Total pendientes reales:', pendientesRealesGrupo1 + pendientesRealesGrupo2);
+            
+            if ((pendientesRealesGrupo1 + pendientesRealesGrupo2) !== totalPending) {
+                console.warn('¡DISCREPANCIA! El cálculo no coincide con la verificación real');
+                console.log('Posibles duplicados en Firebase:', 
+                    allResponses.filter(r => {
+                        const count = allResponses.filter(r2 => 
+                            r2.formulario === r.formulario && 
+                            r2.numeroLocal === r.numeroLocal
+                        ).length;
+                        return count > 1;
+                    })
+                );
+            }
 
-            document.getElementById('statGrupo1Completed').textContent = grupo1Completed;
-            document.getElementById('statGrupo2Completed').textContent = grupo2Completed;
-            document.getElementById('statTotalCompleted').textContent = totalCompleted;
-            document.getElementById('statTotalPending').textContent = totalPending;
+            // Usar el conteo real de pendientes
+            const totalPendientesReal = pendientesRealesGrupo1 + pendientesRealesGrupo2;
+            
+            document.getElementById('statGrupo1Completed').textContent = grupo1Data.length - pendientesRealesGrupo1;
+            document.getElementById('statGrupo2Completed').textContent = grupo2Data.length - pendientesRealesGrupo2;
+            document.getElementById('statTotalCompleted').textContent = (grupo1Data.length - pendientesRealesGrupo1) + (grupo2Data.length - pendientesRealesGrupo2);
+            document.getElementById('statTotalPending').textContent = totalPendientesReal;
         }
 
         function updateTables() {
@@ -667,9 +727,16 @@
             tableGrupo1.innerHTML = '';
             
             grupo1Data.forEach(item => {
-                const response = allResponses.find(r => 
-                    r.formulario === 'grupo1' && r.numeroLocal === item.local
-                );
+                const response = allResponses.find(r => {
+                    // Comparación más robusta: quitar espacios y convertir a string
+                    const firebaseLocal = String(r.numeroLocal || '').trim();
+                    const itemLocal = String(item.local || '').trim();
+                    const match = r.formulario === 'grupo1' && firebaseLocal === itemLocal;
+                    if (r.formulario === 'grupo1' && !match && firebaseLocal) {
+                        console.log(`No match para local ${itemLocal}: Firebase tiene '${firebaseLocal}'`);
+                    }
+                    return match;
+                });
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -693,9 +760,12 @@
             tableGrupo2.innerHTML = '';
             
             grupo2Data.forEach(item => {
-                const response = allResponses.find(r => 
-                    r.formulario === 'grupo2' && r.numeroLocal === item.local
-                );
+                const response = allResponses.find(r => {
+                    // Comparación más robusta: quitar espacios y convertir a string
+                    const firebaseLocal = String(r.numeroLocal || '').trim();
+                    const itemLocal = String(item.local || '').trim();
+                    return r.formulario === 'grupo2' && firebaseLocal === itemLocal;
+                });
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
